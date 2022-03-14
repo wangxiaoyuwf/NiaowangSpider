@@ -2,6 +2,7 @@
 import requests
 from lxml import etree
 import pandas as pd
+import time
 
 
 class NiaoWang_Spider(object):
@@ -76,11 +77,12 @@ def main():
     # for index in range(1, 3):  # 怕鸟网崩了，测试用的
         # 拿到搜索关键字，这里拿表格中的name，也就是鸟的拉丁文学名去搜索
         keyWord = df.name[index]
-        print("keyWord: ", keyWord)
+        print("keyWord: ", index, ",", keyWord)
         # 把关键字传入类
         spider = NiaoWang_Spider(keyWord)
         # 搜索
         bird_name = spider.get_html()
+        time.sleep(30)
         print("bird_name: ", bird_name)
         if bird_name is None:
             continue
