@@ -32,9 +32,6 @@ class NiaoWang_Spider(object):
             # 的header中， 我们要的鸟名字显示在./h2/a/的title里。下面for循环中再写./h2/a/@title
             selector = res.xpath('//div[@class="entry-wrapper"]/header[@class="entry-header"]')
             print("selector: ", selector)
-            # 如果 selecotor 为空，返回 NAN
-            # TODO
-
             # data_list=[]
             name = ""
             for data in selector:
@@ -63,15 +60,19 @@ def main():
     df = pd.read_csv('aiy_birds_V1_labelmap.csv')
     # 第0条不用翻译，强制写入
     df.at[0, 'chinese_name'] = '背景'
-    keyWord = 'Dryobates minor'
+    # keyWord = 'Dryobates minor'
     # keyWord = 'Anser anser domesticus'
     # spider = NiaoWang_Spider(keyWord)
     # bird_name = spider.get_html()
     # print("bird_name: ", bird_name)
+    # print("bird name length: ", len(bird_name))
+    #
     # bird_chinese_name = bird_name.split("/")[0]
     # print("bird_chinese_name: ", bird_chinese_name)
     # df.at[1, 'chinese_name'] = bird_chinese_name
 
+    f = open('none_list.txt', 'a')
+    f.write('none list:' + '\n')
     # 遍历整个df，依次查询每个鸟
     for index in range(1, len(df)):
     # for index in range(1, 3):  # 怕鸟网崩了，测试用的
@@ -82,13 +83,18 @@ def main():
         spider = NiaoWang_Spider(keyWord)
         # 搜索
         bird_name = spider.get_html()
-        time.sleep(30)
+        time.sleep(5)
         print("bird_name: ", bird_name)
+
+        # 如果 bird_name 为None,或者为空字符串，则记录这条数据（方便后续手动添加），并跳出本次循环
         if bird_name is None:
+            print("no select result...")
+            f.write(keyWord + '\n')
             continue
 
-        # 如果 bird_name 为NAN，则记录这条数据（方便后续手动添加），并跳出本次循环
-        # TODO
+        if len(bird_name) == 0:
+            f.write(keyWord + '\n')
+            continue
 
         # 拿到第一个'/'前面的字符串即为我们所要的中文名
         bird_chinese_name = bird_name.split("/")[0]
@@ -96,6 +102,7 @@ def main():
         # 放到 df 中
         df.at[index, 'chinese_name'] = bird_chinese_name
 
+    f.close()
     # 把整个搜索结果连带原来的数据写入到一个新的.csv文件中
     df.to_csv('aiy_birds_V1_labelmap_amended.csv', index=False, encoding='utf-8-sig')
 
